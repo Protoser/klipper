@@ -40,7 +40,8 @@ class BedTilt:
         configfile.set('bed_tilt', 'x_adjust', "%.6f" % (x_adjust,))
         configfile.set('bed_tilt', 'y_adjust', "%.6f" % (y_adjust,))
         configfile.set('bed_tilt', 'z_adjust', "%.6f" % (z_adjust,))
-
+    def reset_adjust(self):
+        self.update_adjust(0, 0, 0)
 # Helper script to calibrate the bed tilt
 class BedTiltCalibrate:
     def __init__(self, config, bedtilt):
@@ -53,9 +54,15 @@ class BedTiltCalibrate:
         self.gcode.register_command(
             'BED_TILT_CALIBRATE', self.cmd_BED_TILT_CALIBRATE,
             desc=self.cmd_BED_TILT_CALIBRATE_help)
+        self.gcode.register_command(
+            'BED_TILT_CLEAR', self.cmd_BED_TILT_CLEAR,
+            desc=self.cmd_BED_TILT_CLEAR_help)
     cmd_BED_TILT_CALIBRATE_help = "Bed tilt calibration script"
     def cmd_BED_TILT_CALIBRATE(self, gcmd):
         self.probe_helper.start_probe(gcmd)
+    cmd_BED_TILT_CLEAR_help = "Clear the Tilt so no z-adjustment is made"
+    def cmd_BED_TILT_CLEAR(self, gcmd):
+        self.bedtilt.reset_adjust()
     def probe_finalize(self, offsets, positions):
         # Setup for coordinate descent analysis
         z_offset = offsets[2]
